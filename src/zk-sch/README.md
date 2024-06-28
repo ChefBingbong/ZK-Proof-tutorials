@@ -18,15 +18,15 @@ The ZKSCH proof that we will implement is a variant of the Schnorr Zero-Knowledg
 </details>
 
 
-## Pre-Requsites
+### Pre-Requsites
 Before continuing its important that you have read the **pre-requisite** section in the `ReadME.md` file at the base directory of this repo. You can find it [here](https://github.com/ChefBingbong/ZK-Proof-tutorials/README.md)
 
-## Overview Of The Schnorr ZKP 
-Now we will go over the Schnorr ZKP algorithm's mathematical definition, explaining each component followed by a step by step code walkthrough. The goal is to generate a proof that demonstrates knowledge of a secret without revealing the secret itself. Before look at the base algorithm its important to understand some definitions that are common in
-all ZKP algorithms.
-
+### Overview Of The Schnorr ZKP 
 <details>
   <summary>read more on the ZKSCH algorithm definitions!</summary>
+
+Now we will go over the Schnorr ZKP algorithm's mathematical definition, explaining each component followed by a step by step code walkthrough. The goal is to generate a proof that demonstrates knowledge of a secret without revealing the secret itself. Before look at the base algorithm its important to understand some definitions that are common in
+all ZKP algorithms.
 
 ### Key Definitions
   - **nonce:**: Zkps use randomly sampled values from the underlying elliptic curve as a nonce. the nonce ensures randomness and unpredictability throughout the proof. It adds a layer of security by ensuring that each proof is unique, even if the same secret is used multiple times.
@@ -49,7 +49,7 @@ all ZKP algorithms.
 </details>
 
 
-### Our Implementation Overview
+### Code Implementation Overview
 our implementation will apply the above formula from schnorr's algorithm. We will write three main functions. `CreateProof`, `VerifyProof` and `CreateRandomness`.
 
 ## createProof
