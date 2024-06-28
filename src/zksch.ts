@@ -71,3 +71,33 @@ export class ZkSchResponse implements JSONable {
             });
       }
 }
+
+export type ZkSchCommitmentJSON = {
+      C: AffinePointJSON;
+};
+
+export class ZkSchCommitment implements JSONable {
+      public readonly C: AffinePoint;
+
+      private constructor(C: AffinePoint) {
+            this.C = C;
+      }
+
+      public static from({ C }: { C: AffinePoint }): ZkSchCommitment {
+            const c = new ZkSchCommitment(C);
+            Object.freeze(c);
+            return c;
+      }
+
+      public toJSON(): ZkSchCommitmentJSON {
+            return {
+                  C: pointToJSON(this.C),
+            };
+      }
+
+      public static fromJSON(json: ZkSchCommitmentJSON): ZkSchCommitment {
+            return ZkSchCommitment.from({
+                  C: pointFromJSON(json.C),
+            });
+      }
+}
