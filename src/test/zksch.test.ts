@@ -1,7 +1,7 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { zkSchCreateRandomness, zkSchProve, zkSchVerifyResponse } from "../zksch.js";
-import { sampleScalar, sampleScalarPointPair } from "../lib/sample.js";
+import { sampleScalar, sampleScalarPointPair } from "../lib/utils.js";
 import { Hasher } from "../lib/Hasher.js";
 import { secp256k1 } from "@noble/curves/secp256k1";
 
