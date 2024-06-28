@@ -5,6 +5,7 @@ import type {
       AffinePointJSON,
       ProjectivePoint,
 } from "./lib/types/common.types.js";
+import { sampleScalar } from "./lib/sample.js";
 
 export const N = secp256k1.CURVE.n;
 
@@ -25,6 +26,11 @@ export type ZkSchRandomness = {
 
 export type ZkSchResponseJSON = {
       Zhex: string;
+};
+
+export type ZkSchProof = {
+      C: ZkSchCommitment;
+      Z: ZkSchResponse;
 };
 
 // Identity point? TODO: check if this is the right way to do it
@@ -101,3 +107,35 @@ export class ZkSchCommitment implements JSONable {
             });
       }
 }
+
+export const zkSchCreateRandomness = (genIn?: AffinePoint): ZkSchRandomness => {
+      const gen = genIn
+            ? secp256k1.ProjectivePoint.fromAffine(genIn)
+            : secp256k1.ProjectivePoint.BASE;
+      const a = sampleScalar();
+      const commitment = ZkSchCommitment.from({
+            C: gen.multiply(a).toAffine(),
+      });
+      return { a, commitment };
+};
+
+const zkSchIsCommitmentValid = (c: ZkSchCommitment): boolean => {
+      if (!c || isIdentity(secp256k1.ProjectivePoint.fromAffine(c.C))) {
+            return false;
+      }
+      return true;
+};
+
+export const zkSchIsResponseValid = (z: ZkSchResponse): boolean => {
+      if (!z || z.Z === 0n) {
+            return false;
+      }
+      return true;
+};
+
+const zkSchIsProofValid = (p: ZkSchProof): boolean => {
+      if (!p || !zkSchIsResponseValid(p.Z) || !zkSchIsCommitmentValid(p.C)) {
+            return false;
+      }
+      return true;
+};
