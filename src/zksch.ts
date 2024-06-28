@@ -45,3 +45,29 @@ const pointFromJSON = (point: AffinePointJSON): AffinePoint => {
             y: BigInt(`0x${point.yHex}`),
       };
 };
+
+export class ZkSchResponse implements JSONable {
+      public readonly Z: bigint;
+
+      private constructor(Z: bigint) {
+            this.Z = Z;
+      }
+
+      public static from({ Z }: { Z: bigint }): ZkSchResponse {
+            const c = new ZkSchResponse(Z);
+            Object.freeze(c);
+            return c;
+      }
+
+      public toJSON(): ZkSchResponseJSON {
+            return {
+                  Zhex: this.Z.toString(16),
+            };
+      }
+
+      public static fromJSON(json: ZkSchResponseJSON): ZkSchResponse {
+            return ZkSchResponse.from({
+                  Z: BigInt(`0x${json.Zhex}`),
+            });
+      }
+}
