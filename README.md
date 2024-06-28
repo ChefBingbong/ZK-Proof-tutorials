@@ -86,21 +86,110 @@ our implementation will apply the above formual from schnorr. We will write thre
 all ZKP algorithms
 
 ## createProof
-
-**Purpose**: Generates a zero-knowledge proof.
-
+The create Proof Function will implement the algorithm described above. Here is the code
 ### Parameters:
 - `secret`: The secret value for which the proof is being created.
 
-### Process:
-1. Generates a random nonce.
-2. Computes the commitment using the nonce.
-3. Creates the challenge using the commitment and the secret.
-4. Computes the response using the nonce, secret, and challenge.
-5. Returns the proof containing the commitment, challenge, and response.
+```ts
+// MAIN SCH ZK logic/algorithm
+export const zkSchProve = (
+      r: ZkSchRandomness,
+      pubPoint: AffinePoint,
+      secret: bigint
+): bigint | null => {
+      const gen = secp256k1.ProjectivePoint.BASE;
 
-## verifyProof
+      if (
+            isIdentity(secp256k1.ProjectivePoint.fromAffine(pubPoint)) ||
+            secret === 0n
+      ) {
+            return null;
+      }
 
+      const e = challenge(r.commitment, pubPoint, gen);
+      const es = modMultiply([e, secret], N);
+      const Z = modAdd([es, r.a], N);
+
+      return Z;
+};
+```
+the `createProof` function requires 3 arguments. 
+### Parameters:
+- `r`: r is an object which holds the ranom nonce we generate aswell as its commitment
+- `pubPoint`: pubPoint here is The proovers public key corresponding to the secret value were using for the proof.
+- `secret`: the secret value for the proof which is only known to the proover
+
+## Step1
+the first thing we need is to define the generator point. The generator is used as the base point which we preform curve arithemtic on as part of the Proofs algorithm. Usually the generator just used the base point
+associated with the curve. In this case the secp256k1's generator point
+```ts
+const gen = secp256k1.ProjectivePoint.BASE;
+```
+
+## Step2
+before we start the main logic we do a simple check to make sure our arguments are correct. For example we need to assert that the users public key's x and y coordinates are not zero.
+```ts
+ if (
+            isIdentity(secp256k1.ProjectivePoint.fromAffine(pubPoint)) ||
+            secret === 0n
+      ) {
+            return null;
+      }
+```
+Note that our public point is in Affine cordinate format, meaning that is defined over the (x,y) coordinate system. for this check we want out publicPoint in Project coordinate system, or in other words we want it in (x,y,z) format. When we do this conversion x and y remain the same
+```ts
+(secp256k1.ProjectivePoint.fromAffine(pubPoint)
+```
+
+## Step 3
+The next step is to generate the proofs challenge from the supplied commitment and public key. remember that the challenege is used to tie together the final proof with the users public point and commitment. that way when the verifier reconstructs it, they can verify the proof only if their reconstruction matches the original challenge. if the challegned doesnt match, then the verifier knows either the provided commitment or proof is incorrect.
+```ts
+ const e = challenge(r.commitment, pubPoint, gen);
+ const es = modMultiply([e, secret], N);
+```
+the challenge is created by e = H(R || M)`, where `H` is a cryptographic hash function. for our purposes we will use sha256 for simplicity. The implementation of the challenge function is
+```ts
+const challenge = (
+      commitment: AffinePoint,
+      pubPoint: AffinePoint,
+      gen: AffinePoint
+): bigint => {
+      const commitmentBuffer = serializeToPointBuffer(commitment);
+      const pubPointBuffer = serializeToPointBuffer(pubPoint);
+      const genBuffer = serializeToPointBuffer(gen);
+
+      // to create our hash (we will use sha256 here) we just use the create hash
+      //util from nodecrypto and encode in our commitment public and generator buffers
+      const hash = crypto
+            .createHash("sha256")
+            .update(commitmentBuffer)
+            .update(pubPointBuffer)
+            .update(genBuffer)
+            .digest();
+
+      const bigHash = bytesToNumberBE(hash);
+      const challenge = modAdd([bigHash, N - 2n ** 255n], N); // TODO
+
+      return challenge;
+};
+```
+alls this code is doing is hashing together the commitment, the proovers publicpoint and the generator we described above. We simply just use createHash from node crypto. However the reason we need to define
+```ts
+  const commitmentBuffer = serializeToPointBuffer(commitment);
+  const pubPointBuffer = serializeToPointBuffer(pubPoint);
+  const genBuffer = serializeToPointBuffer(gen);
+```
+is because we cannot hash these values in the point format, we need to convert them to Buffers, so that we can hash them together using the sha hasing function. To generate the final challenge we use the binint format of the hash and apply ad modulo add operation which simple applies a jacobian addition with the bigint hash with the Prime value of the secp256k1 curve whch is a constant.
+```ts
+const challenge = modAdd([bigHash, N - 2n ** 255n], N); // TODO
+```
+
+## Step4
+The last step to generate the final proof is to apply a modulo add with the challenge and the initial commitment passed into the create proof function
+```ts
+const es = modMultiply([e, secret], N);
+const Z = modAdd([es, r.a], N);
+```
 **Purpose**: Verifies the zero-knowledge proof.
 
 ### Parameters:
