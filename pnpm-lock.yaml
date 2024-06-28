@@ -14,6 +14,9 @@ dependencies:
   bigint-crypto-utils:
     specifier: ^3.3.0
     version: 3.3.0
+  bignumber.js:
+    specifier: ^9.1.2
+    version: 9.1.2
 
 devDependencies:
   '@tsconfig/node20':
@@ -536,6 +539,10 @@ packages:
   /bigint-crypto-utils@3.3.0:
     resolution: {integrity: sha512-jOTSb+drvEDxEq6OuUybOAv/xxoh3cuYRUIPyu8sSHQNKM303UQ2R1DAo45o1AkcIXw6fzbaFI1+xGGdaXs2lg==}
     engines: {node: '>=14.0.0'}
+    dev: false
+
+  /bignumber.js@9.1.2:
+    resolution: {integrity: sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==}
     dev: false
 
   /binary-extensions@2.3.0:
