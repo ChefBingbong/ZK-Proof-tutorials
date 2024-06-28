@@ -1,11 +1,13 @@
 import { secp256k1 } from "@noble/curves/secp256k1";
 
+import type { Hasher } from "./lib/Hasher";
 import type {
       AffinePoint,
       AffinePointJSON,
       ProjectivePoint,
 } from "./lib/types/common.types.js";
 import { sampleScalar } from "./lib/sample.js";
+import { modAdd, modMultiply } from "bigint-crypto-utils";
 
 export const N = secp256k1.CURVE.n;
 
@@ -26,11 +28,6 @@ export type ZkSchRandomness = {
 
 export type ZkSchResponseJSON = {
       Zhex: string;
-};
-
-export type ZkSchProof = {
-      C: ZkSchCommitment;
-      Z: ZkSchResponse;
 };
 
 // Identity point? TODO: check if this is the right way to do it
@@ -108,6 +105,30 @@ export class ZkSchCommitment implements JSONable {
       }
 }
 
+export type ZkSchProof = {
+      C: ZkSchCommitment;
+      Z: ZkSchResponse;
+};
+
+export const zkSchCreateProof = (
+      hasher: Hasher,
+      pubPoint: AffinePoint,
+      priv: bigint,
+      gen: AffinePoint
+): ZkSchProof | null => {
+      const a = zkSchCreateRandomness(gen);
+      const Z = zkSchProve(a, hasher, pubPoint, priv, gen);
+
+      if (!Z) {
+            return null;
+      }
+
+      return {
+            C: a.commitment,
+            Z,
+      };
+};
+
 export const zkSchCreateRandomness = (genIn?: AffinePoint): ZkSchRandomness => {
       const gen = genIn
             ? secp256k1.ProjectivePoint.fromAffine(genIn)
@@ -117,6 +138,88 @@ export const zkSchCreateRandomness = (genIn?: AffinePoint): ZkSchRandomness => {
             C: gen.multiply(a).toAffine(),
       });
       return { a, commitment };
+};
+
+const challenge = (
+      hasher: Hasher,
+      commitment: ZkSchCommitment,
+      pubPoint: AffinePoint,
+      gen: AffinePoint
+): bigint => {
+      const bigHash = hasher
+            .updateMulti([commitment.C, pubPoint, gen])
+            .digestBigint();
+
+      const challenge = modAdd([bigHash, N - 2n ** 255n], N); // TODO
+
+      return challenge;
+};
+
+export const zkSchProve = (
+      r: ZkSchRandomness,
+      hasher: Hasher,
+      pubPoint: AffinePoint,
+      secret: bigint,
+      genIn?: AffinePoint
+): ZkSchResponse | null => {
+      const gen = genIn
+            ? secp256k1.ProjectivePoint.fromAffine(genIn)
+            : secp256k1.ProjectivePoint.BASE;
+
+      if (
+            isIdentity(secp256k1.ProjectivePoint.fromAffine(pubPoint)) ||
+            secret === 0n
+      ) {
+            return null;
+      }
+
+      const e = challenge(hasher, r.commitment, pubPoint, gen);
+      const es = modMultiply([e, secret], N);
+      const Z = modAdd([es, r.a], N);
+
+      return ZkSchResponse.from({ Z });
+};
+
+export const zkSchVerifyResponse = (
+      z: ZkSchResponse | null,
+      hasher: Hasher,
+      pubPoint: AffinePoint,
+      commitment: ZkSchCommitment,
+      genIn?: AffinePoint
+): boolean => {
+      if (!z) {
+            return false;
+      }
+
+      const gen = genIn
+            ? secp256k1.ProjectivePoint.fromAffine(genIn)
+            : secp256k1.ProjectivePoint.BASE;
+
+      const pubPointProj = secp256k1.ProjectivePoint.fromAffine(pubPoint);
+      if (!z || !zkSchIsResponseValid(z) || isIdentity(pubPointProj)) {
+            return false;
+      }
+
+      const e = challenge(hasher, commitment, pubPoint, gen);
+
+      const lhs = gen.multiply(z.Z);
+      const rhs = pubPointProj
+            .multiply(e)
+            .add(secp256k1.ProjectivePoint.fromAffine(commitment.C));
+
+      return lhs.equals(rhs);
+};
+
+export const zkSchVerifyProof = (
+      p: ZkSchProof,
+      hasher: Hasher,
+      pubPoint: AffinePoint,
+      genIn: AffinePoint
+): boolean => {
+      if (!zkSchIsProofValid(p)) {
+            return false;
+      }
+      return zkSchVerifyResponse(p.Z, hasher, pubPoint, p.C, genIn);
 };
 
 const zkSchIsCommitmentValid = (c: ZkSchCommitment): boolean => {
