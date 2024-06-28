@@ -1,0 +1,20 @@
+{
+  "name": "zk-tutorials",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "tutorials for lightweight zk proofs in Javascript",
+  "scripts": {
+    "test": "node --import tsx --test src/**/*.test.ts src/**/**/*.test.ts"
+  },
+  "author": "chef Bingbong",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.2",
+    "@types/node": "^20.9.3",
+    "tsup": "^8.0.1",
+    "tsx": "^4.2.0",
+    "typescript": "^5.3.2"
+  },
+  "sideEffects": false,
+  "packageManager": "pnpm@8.15.6"
+}
