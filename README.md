@@ -10,6 +10,7 @@ knowledge i want to cover that is crucial to understand if you want to know what
 
 <details>
    <summary>recommended pre-requsite knowedge for following along</summary>
+   
 ### Elliptic Curves and (Secp256k1 curve)
 All zero knowledge proofs implement arithemtic operations based off of some elliptic curve. Many of the different ZKP algorithms use series mathematical operations to both create and generate proofs. All of these operations are usually
 scalar point operations such as `multiply' 'add' 'subtract' etc, that use linear algebra to do arithmetic on points that lie on the underlying elliptic curve with different scalars that are involved in said algorithm at hand.
