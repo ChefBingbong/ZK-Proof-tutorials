@@ -2,6 +2,10 @@
 
 The proof called ZKSCH in this repository likely refers to a variant of the Schnorr Zero-Knowledge Proof (Schnorr ZKP), named after Claus Schnorr.
 
+<details>
+  <summary>**Click to read more on the ZKSCH proof!</summary>
+
+  
 ### Unique Aspects of ZKSCH (Schnorr ZKP):
 - **Simplicity and Efficiency**: Schnorr ZKPs are known for their simplicity and computational efficiency, making them suitable for environments with limited computational resources.
 - **Security Based on Discrete Logarithms**: The security of Schnorr ZKP relies on the hardness of the discrete logarithm problem, particularly within the context of elliptic curve cryptography (ECC) as used in this example.
@@ -13,12 +17,15 @@ The proof called ZKSCH in this repository likely refers to a variant of the Schn
 - **Efficiency**: Due to its reliance on simple arithmetic operations over elliptic curve groups, ZKSCH is generally more efficient compared to other more complex ZKPs like zk-SNARKs, which involve heavy polynomial computations and zero-knowledge succinctness.
 
 In summary, ZKSCH (Schnorr ZKP) stands out due to its efficiency, simplicity, and reliance on well-established cryptographic hardness assumptions, making it a robust choice for zero-knowledge proofs in various cryptographic protocols.
+</details>
 
 
 ## Pre-Requsites
 Anyone with basic proficcency in typescript and basic knowdelge of what ZKP's are can follow this tutorial. However before we exlain how the proof works aswell as breaking down the code, there are some definitions and some background
 knowledge i want to cover that is crucial to understand if you want to know whats going on in the implementation. 
 
+<details>
+  <summary>Click to read more on the pre-requisites!</summary>
 ### Elliptic Curves and (Secp256k1 curve)
 All zero knowledge proofs implement arithemtic operations based off of some elliptic curve. Many of the different ZKP algorithms use series mathematical operations to both create and generate proofs. All of these operations are usually
 scalar point operations such as `multiply' 'add' 'subtract' etc, that use linear algebra to do arithmetic on points that lie on the underlying elliptic curve with different scalars that are involved in said algorithm at hand.
@@ -59,10 +66,15 @@ Projective points are used internally in many elliptic curve algorithms (e.g., E
 
 During our implementation below you will often see the conversion of things like `the proovers public key and secret` from Affine coordinates (x,y) to projective coordinates (x,y,z) for more efficent scalar point operations like `multiply`
 that are required by the schnorr SCH Proof.
+</details>
+
 
 ## Overview Of The Schnorr ZKP 
 Now we will go over the Schnorr ZKP algorithm explaining each component followed by a step by step code walkthrough. The goal is to generate a proof that demonstrates knowledge of a secret without revealing the secret itself. Before look at the base algorithm its important to understand some definitions that are common in
 all ZKP algorithms.
+
+<details>
+  <summary>read more on the ZKSCH algorithm definitions!</summary>
 
 ### Key Definitions
   - **nonce:**: Zkps use randomly sampled values from the curve as a nonce. the nonce ensures randomness and unpredictability throughout the proof. It adds a layer of security by ensuring that each proof is unique, even if the same secret is used multiple times.The commitment is a point on the elliptic curve derived from the nonce.
@@ -80,6 +92,9 @@ all ZKP algorithms.
 2. **Verifier's Steps:**
    - **Recompute commitment:**: Compute `R' = s * G - e * publicKey`.
    - **Verify the proof:**: Accept the proof if `R == R'`, indicating that the prover possesses the secret without revealing `x`.
+
+</details>
+
 
 ### Our Implementation Overview
 our implementation will apply the above formual from schnorr. We will write three main functions. `CreateProof`, `VerifyProof` and `CreateRandomness`. However before we breakdown the code its important to understand these definitions that are common in
