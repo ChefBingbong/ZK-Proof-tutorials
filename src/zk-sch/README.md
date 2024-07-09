@@ -22,9 +22,6 @@ The ZKSCH proof that we will implement is a variant of the Schnorr Zero-Knowledg
 Before continuing its important that you have read the **pre-requisite** section in the `ReadME.md` file at the base directory of this repo. You can find it [here](https://github.com/ChefBingbong/ZK-Proof-tutorials/README.md)
 
 ### Overview Of The Schnorr ZKP 
-<details>
-  <summary>read more on the ZKSCH algorithm definitions!</summary>
-
 Now we will go over the Schnorr ZKP algorithm's mathematical definition, explaining each component followed by a step by step code walkthrough. The goal is to generate a proof that demonstrates knowledge of a secret without revealing the secret itself. Before look at the base algorithm its important to understand some definitions that are common in
 all ZKP algorithms.
 
@@ -44,9 +41,6 @@ all ZKP algorithms.
 2. **Verifier's Steps:**
    - **Recompute commitment:** Compute $\(R' = s \cdot G - e \cdot \text{publicKey}\)$.
    - **Verify the proof:** Accept the proof if $\(R = R'\)$, indicating that the prover possesses the secret without revealing $\(x\)$.
-
-
-</details>
 
 
 ### Code Implementation Overview
