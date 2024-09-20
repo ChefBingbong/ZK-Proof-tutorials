@@ -2,10 +2,8 @@
 
 The ZKSCH proof that we will implement is a variant of the Schnorr Zero-Knowledge Proof (Schnorr ZKP), named after Claus Schnorr. This is a very simple proof to implement as its underlying algorithm is very simple an only involves a couple of steps. It is a great introductory proof which you can use to learn some of the more important techniques and definitions used im many ZKP algorithms.
 
-<details>
-  <summary>More on the ZKSCH proof!</summary>
+## More on the ZKSCH proof!
 
-  
 ### Unique Aspects of ZKSCH (Schnorr ZKP):
 - **Simplicity and Efficiency**: Schnorr ZKPs are known for their simplicity and computational efficiency, making them suitable for environments with limited computational resources.
 - **Non-interactive Variants**: Schnorr ZKP can be transformed into a non-interactive proof using the Fiat-Shamir heuristic, which makes it practical for many cryptographic applications, such as digital signatures. Although this is not the variant we will be applying here
@@ -14,9 +12,6 @@ The ZKSCH proof that we will implement is a variant of the Schnorr Zero-Knowledg
 - **Commitment and Challenge**: Like many ZKPs, ZKSCH involves a commitment phase `(generating a random value and computing a corresponding commitment)` and a challenge phase (computing a challenge from the commitment and public values). The challenge and commitment are used to ensure both randomness and unpredictability in the proof
 - **Response Calculation**: The `response in Schnorr ZKP` is computed to `tie` the random `commitment` and the `challenge` to the `prover's secret`, ensuring that the verifier can confirm the prover's knowledge without revealing the secret.
 - **Efficiency**: Due to its reliance on simple arithmetic operations over elliptic curve groups, ZKSCH is generally more efficient compared to other more complex ZKPs like zk-SNARKs, which involve heavy polynomial computations and zero-knowledge succinctness.
-
-</details>
-
 
 ### Pre-Requsites
 Before continuing its important that you have read the **pre-requisite** section in the `ReadME.md` file at the base directory of this repo. You can find it [here](https://github.com/ChefBingbong/ZK-Proof-tutorials/README.md)
