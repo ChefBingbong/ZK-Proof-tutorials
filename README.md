@@ -28,9 +28,6 @@ pnpm test
 
 Anyone with `basic proficiency in Typescript` and `basic knowledge of what ZKPs are` can follow this tutorial. However, before we explain how the proof works and break down the code, there are some definitions and background knowledge that are crucial to understanding the implementation.
 
-<details>
-   <summary>Recommended prerequisite knowledge for following along</summary>
-   
 ### Elliptic Curves and the Secp256k1 Curve
 
 All zero-knowledge proofs implement arithmetic operations based on some `elliptic curve`. Many ZKP algorithms use a series of mathematical operations to both create and generate proofs according to some underlying algorithm. These operations are usually scalar point matrix operations such as `multiply`, `add`, etc that use linear algebra to do arithmetic on points that lie on the underlying elliptic curve with different scalars involved in the algorithm. A common curve used in Ethereum is the `Secp256k1` curve. `EVM EOA` addresses are actually just derived from `public keys` which are just a `point on one of these elliptic curves`. Nearly `all operations` in public key cryptography `boil down` to different combinations of arithmetic `operations of these curve posint coordinates`, wthether it be to store data, or to bind values to some point so that the new point can be used without revealing the underlying data
@@ -60,5 +57,3 @@ An affine point $\( P \)$ is represented as $\( (x, y) \)$ where $\( x \)$ and $
 `A projective point` $\( (X, Y, Z) \)$ consists of `three coordinates` $\( X, Y, \)$ and $\( Z \)$, `where $\( (X/Z, Y/Z) \)$` represents the corresponding `affine point`. Unlike affine points, projective coordinates allow for efficient point addition and scalar multiplication by exploiting the structure of elliptic curves. Projective points are used internally in many elliptic curve algorithms (e.g., ECDSA, Schnorr) for efficient point operations.
 
 During the different implementations in this repo, you will often see the conversion of things like `the prover's public key and secret` from affine coordinates $(x, y)$ to projective coordinates $(X, Y, Z)$ for more efficient scalar point operations like `multiply` that are required by the Schnorr SCH Proof.
-
-</details>
